@@ -96,13 +96,23 @@ font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-a
 
 ## 部署
 
-任意静态文件服务器均可。线上的做法是：
+**推送到 `main` 即自动上线**，约 1 分钟生效，由 `.github/workflows/deploy.yml` 完成：
 
-1. 每次发布把仓库文件放进一个新的版本目录，以 `日期-序号` 命名，如 `20261013-02`。
-2. 将 `current` 软链切到新目录，Web 服务器的根目录指向 `current`。
-3. 需要回滚时，把软链指回上一个版本目录即可。
+1. GitHub Actions 用 `git archive` 打包。`.gitattributes` 中标了 `export-ignore` 的文件（README、`.github` 等）不会进入线上。
+2. 通过 SSH 把包交给服务器上的发布脚本。部署账号的密钥被限定为只能执行这个脚本：拿不到 shell，也不能做端口转发。
+3. 发布脚本校验包：拒收软链、绝对路径、`..` 路径、缺少 `index.html` 的包，以及超过 50MB 的包。
+4. 校验通过后，解压到新的版本目录，以 `日期-序号` 命名，如 `20261015-01`；目录里的 `.revision` 记录对应的提交号，对外不可访问。然后原子切换 `current` 软链。
+5. 切换后请求一次源站首页，核对内容。**不一致或打不开，就自动切回上一版**，并删除这个失败的版本。
+6. 只保留最近 5 个版本，更早的自动清理。
 
-站点前面有 CDN，HTTPS 由 CDN 终止。发布后如果线上没更新，需要刷新 CDN 缓存。
+其他说明：
+
+- 只改 `README.md` 的推送不触发部署。需要重新发布时，可以在 Actions 页面手动运行「部署到线上」。
+- 同一时间只会有一个部署在跑，后来的排队等候。
+- 想回滚到更早的版本，需要登录服务器手动切换 `current` 软链。
+- 部署用到的 Secrets：`DEPLOY_SSH_KEY`、`DEPLOY_HOST`、`DEPLOY_KNOWN_HOSTS`。服务器地址和密钥都不在代码里。
+
+站点前面有 CDN，HTTPS 由 CDN 终止。发布后如果线上没更新，需要刷新 CDN 缓存。修改 CSS/JS 时记得递增 `?v=`。
 
 服务器还需要配置这些响应头：上节的 CSP、`X-Content-Type-Options: nosniff`、`Referrer-Policy: strict-origin-when-cross-origin`、`X-Frame-Options: SAMEORIGIN`。缓存规则是：`index.html` 设为 `no-store`，静态资源缓存 1 小时。
 
