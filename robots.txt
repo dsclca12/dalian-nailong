@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://xn--pssa0vz4e155inzt.com/sitemap.xml
