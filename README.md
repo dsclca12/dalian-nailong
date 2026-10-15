@@ -42,7 +42,6 @@
 │   ├── campus-autumn.webp    # 校园生活卡片 · 漫游校园
 │   ├── campus-life.webp      # 校园生活卡片 · SOVO；SOVO 导览弹窗配图
 │   ├── campus-seasons.webp   # 校园生活卡片 · 四季；四季导览弹窗配图
-│   ├── campus-train.webp     # 目前未被任何页面引用
 │   └── seal.svg              # 趣味校徽，同时作为 favicon
 ├── robots.txt
 └── sitemap.xml
