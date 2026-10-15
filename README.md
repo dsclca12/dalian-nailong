@@ -20,7 +20,7 @@
 
 ## 功能
 
-- **入学纪念卡**：填写昵称（≤12 字）并选择学院，在浏览器本地生成纪念卡，可下载为 SVG。卡号格式 `DNLU-xxxxxx-xxxx`，由时间戳加 `crypto.getRandomValues` 随机数组成。昵称不上传、不存储，嵌入 SVG 前经过 XML 转义。
+- **入学纪念卡**：填写昵称（≤12 字）并选择学院，在浏览器本地生成纪念卡，可生成高清 PNG 图片（2240 × 1360）并下载，手机也可长按生成的图片保存；同时保留 SVG 下载。图片转换失败可重试或下载 SVG。卡号格式 `DNLU-xxxxxx-xxxx`，由时间戳加 `crypto.getRandomValues` 随机数组成。昵称不上传、不存储，嵌入 SVG 前经过 XML 转义。
 - **详情弹窗**：学院、要闻、校园导览共用原生 `<dialog>`，关闭后焦点回到触发按钮。
 - **新闻筛选**：按 `data-category` 过滤，按钮状态用 `aria-pressed` 标记。
 - **移动端导航**：汉堡菜单，760px 以下启用。
@@ -33,9 +33,15 @@
 
 ```
 .
+├── .github/          # 部署与测试工作流、PR 模板和效果截图（不上线）
+├── .gitignore        # 本地依赖与测试产物忽略规则（不上线）
 ├── index.html        # 页面结构与全部静态文案
 ├── app.js            # 交互逻辑与弹窗内容数据（原生 JS，无依赖）
 ├── styles.css        # 全部样式（已压缩）
+├── tests/           # 纪念卡导出的跨浏览器测试与带 CSP 的本地测试服务器（不上线）
+├── package.json     # 仅开发使用的测试依赖，无运行时依赖（不上线）
+├── package-lock.json
+├── playwright.config.cjs # Chromium / Firefox / WebKit 测试配置（不上线）
 ├── assets/
 │   ├── hero-campus.webp      # 首屏主视觉（AI 创作）
 │   ├── campus-overview.webp  # 学校概况配图；「漫游校园」导览弹窗配图
@@ -57,6 +63,18 @@
 python -m http.server 8000
 # 打开 http://localhost:8000
 ```
+
+## 纪念卡导出测试
+
+测试需要 Node.js 20+（CI 使用 Node.js 22），不影响静态站点的预览或部署：
+
+```bash
+npm ci
+npx playwright install --with-deps chromium firefox webkit
+npm test
+```
+
+测试服务器启用与线上相同的 CSP，覆盖 PNG/SVG 下载、特殊字符、转换失败重试、重新制卡和手机布局。PR 与 main 推送会自动运行；测试配置及依赖不进入发布包。PNG 保存依赖浏览器下载功能；手机浏览器也可长按预览图片保存，不保证直接写入相册。
 
 ## 修改指南
 
