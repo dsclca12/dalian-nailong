@@ -545,6 +545,7 @@
           pngDownload.download = cardFilename(card, 'png');
           pngPreview.hidden = false;
           pngStatus.textContent = '图片已生成，可下载 PNG；手机也可长按图片保存。';
+          pngPreview.scrollIntoView({ block: 'nearest', behavior: reduceMotion() ? 'instant' : 'smooth' });
         } catch {
           if (generation !== pngGeneration) return;
           pngStatus.textContent = 'PNG 生成失败，请重试，或选择下载 SVG。';

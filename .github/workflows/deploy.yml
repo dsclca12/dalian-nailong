@@ -7,13 +7,6 @@ on:
       - 'README.md'
       - 'CONTRIBUTING.md'
       - '.github/pull_request_template.md'
-      - '.github/workflows/test.yml'
-      - '.github/pr-assets/**'
-      - '.gitignore'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'playwright.config.cjs'
-      - 'tests/**'
   workflow_dispatch:
 
 concurrency:
